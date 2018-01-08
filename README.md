@@ -27,3 +27,30 @@ Corresponding BibTeX entry:
       pages = {1--26},
       doi = {10.18637/jss.v082.i13},
     }
+
+## Discovered a bug?
+
+Please raise a new issue! Preferably add code that illustrates the problem using one of the datasets from the **lmerTest**.
+
+## Installation
+
+Basically there are two options for installing **lmerTest**:
+
+1. Released (stable version) from CRAN: in **R** run `install.packages("lmerTest")`.
+2. Development version from GitHub: First load the **devtools** package (and install it if you do not have it) and install the default (master) branch:
+```
+library("devtools")
+install_github("runehaubo/lmerTest")
+```
+If you haven't already installed a previous version of **lmerTest** you need to also install dependencies (other packages that **lmerTest** depends on and requires you to install to function properly). We recommend that you install **lmerTest** from CRAN (using `install.packages("lmerTest")`) before installing from GitHub as described above. 
+
+An alternative is to use 
+```
+library("devtools")
+install_github("runehaubo/lmerTest", dependencies=TRUE)
+```
+but that requires you to install all dependent packages from source (which only works if you have the correct compilers installed and set up correctly); installing the pre-compiled packages from CRAN is usually easier.
+
+
+  
+
