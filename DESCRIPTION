@@ -1,7 +1,7 @@
 Package: lmerTest
 Type: Package
 Title: Tests in Linear Mixed Effects Models
-Version: 2.0-36
+Version: 2.0-37
 Authors@R: c(person("Alexandra", "Kuznetsova", role = c("aut")),
                    person("Per", "Bruun Brockhoff", role = c("aut", "ths", "cre"),
                    email = "perbb@dtu.dk"),
@@ -19,10 +19,3 @@ Description: Different kinds of tests for linear mixed effects models as impleme
 LazyData: TRUE
 License: GPL (>= 2)
 NeedsCompilation: no
-Packaged: 2017-11-29 20:49:20 UTC; rhbc
-Author: Alexandra Kuznetsova [aut],
-  Per Bruun Brockhoff [aut, ths, cre],
-  Rune Haubo Bojesen Christensen [aut]
-Maintainer: Per Bruun Brockhoff <perbb@dtu.dk>
-Repository: CRAN
-Date/Publication: 2017-11-30 13:00:11 UTC
