@@ -19,3 +19,5 @@ Description: Different kinds of tests for linear mixed effects models as impleme
 LazyData: TRUE
 License: GPL (>= 2)
 NeedsCompilation: no
+URL: https://github.com/runehaubo/lmerTest
+BugReports: https://github.com/runehaubo/lmerTest/issues
