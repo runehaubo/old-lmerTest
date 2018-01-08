@@ -1,6 +1,6 @@
-calcANOVA <- function(model, ddf = "Satterthwaite", type = 3, change.contr = TRUE){
-
-  if(!(type %in% c(1,2,3)))  
+calcANOVA <- function(model, ddf = "Satterthwaite", type = 3, 
+                      change.contr = TRUE) {
+  if(!(type %in% c(1, 2, 3)))  
     stop('Parameter type is wrongly specified') ## check type of hypothesis
   
   rho <- list() ## environment containing info about model
@@ -51,28 +51,22 @@ calcSummary <- function(model, ddf = "Satterthwaite"){
 }
 
 
-
 ################################################################################
 ## function to calculate F stat and pvalues for a given term
 ################################################################################
-calcFpvalueSS <- function(Lc, rho, ddf, type)
-{
+calcFpvalueSS <- function(Lc, rho, ddf, type) {
   if(is.null(Lc))
     return(NULL) 
   ## BUG: check vases example from Per
-  #calculate ss
-  #ss = 1##getSS(Lc, fullCoefs, ginv(crossprod(X.design)))
+  # calculate ss
+  # ss = 1##getSS(Lc, fullCoefs, ginv(crossprod(X.design)))
   
   # for running rune's vcov function
   ## TODO: UNCOMMENT (commented because of use ...type3.red)
-  if(is.vector(Lc))
-  {
+  if(is.vector(Lc)) {
     Lc <- Lc[rho$Xlist$nums.Coefs]
-  }
-  else
-  {
-    if(type == 3)
-      Lc <- Lc[ , rho$Xlist$nums.Coefs]
+  } else {
+    if(type == 3) Lc <- Lc[, rho$Xlist$nums.Coefs]
   }
 
   if(ddf=="Kenward-Roger")

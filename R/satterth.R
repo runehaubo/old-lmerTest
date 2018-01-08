@@ -5,7 +5,7 @@ calcSatt <- function(rho, L, isF = TRUE, calcSS = TRUE){
     result <- calcSatterth1DF(rho, L, isF)
   else
     result <- calcSatterthMultDF(rho, L)
-  if(!calcSS){
+  if(!calcSS) {
     result$ss <- NULL
     result$ms <- NULL
   }
@@ -81,7 +81,7 @@ calcKRMultDF <- function(rho, Lc){
 
 ## calculates F statistics with Satterthwaite's approximation
 ## L is a matrix
-calcSatterthMultDF <- function(rho, Lc){
+calcSatterthMultDF <- function(rho, Lc) {
   # F statistics for tested term
   vcov.final <- as.matrix(vcov(rho$model))
   if(is.vector(Lc))
@@ -95,7 +95,6 @@ calcSatterthMultDF <- function(rho, Lc){
   
   q <- qr(C.theta.optim)$rank
   F.stat <- (t(Lc %*% rho$fixEffs) %*% invC.theta %*% (Lc %*% rho$fixEffs)) / q
-  
   
   #df for F statistics for tested term
   svdec <- eigen(C.theta.optim) 
@@ -125,7 +124,6 @@ calcSatterthMultDF <- function(rho, Lc){
   nu.m <- unlist(llply(1:length(svdec$values), .fun = nu.m.fun))
   
   nu.m[which(abs(2 - nu.m) < 1e-5)] <- 2.00001
-  
   
   E <- sum( (nu.m/(nu.m-2)) * as.numeric(nu.m>2))
   nu.F <- 2 * E * as.numeric(E > q) / (E - q)
@@ -171,7 +169,7 @@ calcApvar <- function(rho){
 
 
 ## devfun function as a function of optimal parameters
-devfunTheta <- function (fm) 
+devfunTheta <- function(fm) 
 {
   stopifnot(is(fm, "merMod"))
   

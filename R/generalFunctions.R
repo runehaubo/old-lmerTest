@@ -120,85 +120,73 @@ lmer <- function(formula, data = NULL, REML = TRUE,
 
 
 
-setMethod("anova", signature(object="merModLmerTest"),
-          function(object, ..., ddf="Satterthwaite", type=3)  
-          {
-            mCall <- match.call(expand.dots = TRUE)
-            dots <- list(...)
-            modp <- if (length(dots))
-              sapply(dots, is, "merModLmerTest") | sapply(dots, is, "merMod") | 
-              sapply(dots, is, "lm") else logical(0)
-            if (any(modp)) {
-              return(callNextMethod())
-            }
-            else
-            {
-              cnm <- callNextMethod()
-              if(!is.null(ddf) &&  ddf=="lme4") 
-                return(cnm)              
-                {
-                  table <- cnm 
-                  
-                  ## errors in specifying the parameters
-                  ddf <- checkNameDDF(ddf)
-                  an.table <- tryCatch({calcANOVA(model=object, ddf=ddf, type=type)}
-                                       , error = function(e) { NULL })
-                  if(!is.null(an.table))
-                  {
-                    table <- an.table
-                    
-                    attr(table, "heading") <- 
-                      paste("Analysis of Variance Table of type", as.roman(type) ,
-                            " with ", ddf, 
-                            "\napproximation for degrees of freedom")
-                  }
-                  else
-                    message("anova from lme4 is returned\nsome computational error has occurred in lmerTest")
-                  
-                  
-                  
-                  class(table) <- c("anova", "data.frame")
-                  return(table)
-                }  
+setMethod("anova", signature(object="merModLmerTest"), function(object, ..., ddf="Satterthwaite", type=3) {
+  mCall <- match.call(expand.dots = TRUE)
+  dots <- list(...)
+  modp <- if (length(dots))
+    sapply(dots, is, "merModLmerTest") | sapply(dots, is, "merMod") | 
+    sapply(dots, is, "lm") else logical(0)
+  if (any(modp)) {
+    return(callNextMethod())
+  }
+  else
+  {
+    cnm <- callNextMethod()
+    if(!is.null(ddf) &&  ddf=="lme4") return(cnm)
+    {
+      table <- cnm 
+      ## errors in specifying the parameters
+      ddf <- checkNameDDF(ddf)
+      an.table <- tryCatch({calcANOVA(model=object, ddf=ddf, type=type)}
+                           , error = function(e) { NULL })
+      if(!is.null(an.table)) {
+        table <- an.table
+        attr(table, "heading") <- 
+          paste("Analysis of Variance Table of type", as.roman(type) ,
+                " with ", ddf, 
+                "\napproximation for degrees of freedom")
+      }
+      else {
+        message("anova from lme4 is returned\nsome computational error has occurred in lmerTest")
+      }
+      class(table) <- c("anova", "data.frame")
+      return(table)
+    }
+  }
+})
 
-            }
-
-          })
-
-setMethod("summary", signature(object = "merModLmerTest"),
-          function(object, ddf="Satterthwaite", ...){
-            if(!is.null(ddf) && ddf=="lme4"){
-              if(class(object) == "merModLmerTest")
-                return(summary(as(object, "lmerMod")))
-              #return(cl)
-            }else{
-              ## commented callNextMethod
-              ## since it produces warning, summary cannot have multiple arguments
-              ##cl <- callNextMethod()
-              if(class(object) == "merModLmerTest")
-                cl <- summary(as(object, "lmerMod"))
-              #errors in specifying the parameters
-              ddf <- checkNameDDF(ddf)
-              
-              tsum <- tryCatch( {calcSummary(object, ddf)}, 
-                                error = function(e) { NULL })
-              if(is.null(tsum)){
-                message("summary from lme4 is returned\nsome computational error has occurred in lmerTest")
-                return(cl)
-              }
-              coefs.satt <- cbind(cl$coefficients[,1:2, drop = FALSE], tsum$df, 
-                                  tsum$tvalue, tsum$tpvalue)               
-              cl$coefficients <- coefs.satt
-              colnames(cl$coefficients)[3:5] <- c("df","t value","Pr(>|t|)")              
-            }   
-            
-            cl$methTitle <- paste(cl$methTitle,  "\nt-tests use ", ddf, 
-                                  "approximations to degrees of freedom")
-            return(cl)
-          })
+setMethod("summary", signature(object = "merModLmerTest"), function(object, ddf="Satterthwaite", ...) {
+  if(!is.null(ddf) && ddf=="lme4"){
+    if(class(object) == "merModLmerTest")
+      return(summary(as(object, "lmerMod")))
+    #return(cl)
+  }else{
+    ## commented callNextMethod
+    ## since it produces warning, summary cannot have multiple arguments
+    ## cl <- callNextMethod()
+    if(class(object) == "merModLmerTest") cl <- summary(as(object, "lmerMod"))
+    # errors in specifying the parameters
+    ddf <- checkNameDDF(ddf)
+    
+    tsum <- tryCatch( {calcSummary(object, ddf)}, 
+                      error = function(e) { NULL })
+    if(is.null(tsum)){
+      message("summary from lme4 is returned\nsome computational error has occurred in lmerTest")
+      return(cl)
+    }
+    coefs.satt <- cbind(cl$coefficients[,1:2, drop = FALSE], tsum$df, 
+                        tsum$tvalue, tsum$tpvalue)               
+    cl$coefficients <- coefs.satt
+    colnames(cl$coefficients)[3:5] <- c("df","t value","Pr(>|t|)")              
+  }   
+  
+  cl$methTitle <- paste(cl$methTitle,  "\nt-tests use ", ddf, 
+                        "approximations to degrees of freedom")
+  return(cl)
+})
 
 
-calcSatterth <- function(model, L){
+calcSatterth <- function(model, L) {
   if(!inherits(model, "lmerMod"))
     stop("The model is not linear mixed effects model")
   rho <- list()  ## vector containing info about model
@@ -208,20 +196,17 @@ calcSatterth <- function(model, L){
 }
 
 
-rand <- function(model, ...)
-{
+rand <- function(model, ...) {
   if(!inherits(model, "lmerMod"))
     stop("The model is not linear mixed effects model")
   result <- testrand(model, reduce.random = FALSE, keep.effs = NULL,
-                                 alpha.random = 0.1)
+                     alpha.random = 0.1)
   res <- list(rand.table=result)
   class(res) <- "rand"
   res
 }
 
-print.rand <- function(x, ...)
-{
-  
+print.rand <- function(x, ...) {
   cat("Analysis of Random effects Table:\n")
   if(!is.null(x))
     printCoefmat(x$rand.table, digits=3 , dig.tst=1  ,
@@ -236,8 +221,7 @@ lsmeans <- function(model, test.effs=NULL, ddf = "Satterthwaite", ...){
 }
 
 
-lsmeansLT <- function(model, test.effs=NULL, ddf = "Satterthwaite", ...)
-{
+lsmeansLT <- function(model, test.effs=NULL, ddf = "Satterthwaite", ...) {
   if(!inherits(model, "lmerMod"))
     stop("The model is not linear mixed effects model")
   
@@ -249,9 +233,7 @@ lsmeansLT <- function(model, test.effs=NULL, ddf = "Satterthwaite", ...)
   res 
 }
 
-print.lsmeansLT <- function(x, ...)
-{
-  
+print.lsmeansLT <- function(x, ...) {
   cat("Least Squares Means table:\n")
   printCoefmat(data.matrix(x$lsmeans.table), dig.tst=1, 
                tst.ind=c(1:(which(colnames(x$lsmeans.table)=="Estimate")-1),
@@ -264,17 +246,14 @@ print.lsmeansLT <- function(x, ...)
 #   plot.lsmeansLT(x, main = main, cex = cex, effs = effs, mult = mult)
 # }
 
-plot.lsmeansLT <- function(x, main = NULL, cex = 1.4, effs = NULL, mult = TRUE, ...)
-{
-  
+plot.lsmeansLT <- function(x, main = NULL, cex = 1.4, effs = NULL, mult = TRUE, ...) {
   #plots for LSMEANS
   if(!is.null(x$lsmeans.table) && nrow(x$lsmeans.table)>0)
     plotLSMEANS(x$lsmeans.table, x$response, "LSMEANS", main = main, cex = cex,
                 effs = effs,  mult = mult)     
 }
 
-difflsmeans <- function(model, test.effs=NULL, ddf = "Satterthwaite", ...)
-{
+difflsmeans <- function(model, test.effs=NULL, ddf = "Satterthwaite", ...) {
   if(!inherits(model, "lmerMod"))
     stop("The model is not linear mixed effects model")
   
@@ -288,23 +267,17 @@ difflsmeans <- function(model, test.effs=NULL, ddf = "Satterthwaite", ...)
 }
 
 
-print.difflsmeans <- function(x, ...)
-{
-  
+print.difflsmeans <- function(x, ...) {
   cat("Differences of LSMEANS:\n")
   printCoefmat(data.matrix(x$diffs.lsmeans.table), dig.tst=1, 
                tst.ind=c(1:(which(colnames(x$diffs.lsmeans.table)=="Estimate")-1),
                          which(colnames(x$diffs.lsmeans.table)=="DF")), digits=3,
                P.values=TRUE, has.Pvalue=TRUE)
-  
 }
 
 
-
 plot.difflsmeans <- function(x, main = NULL, cex = 1.4, effs = NULL, 
-                             mult = TRUE, ...)
-{
-  
+                             mult = TRUE, ...) {
   #plots for DIFF of LSMEANS
   if(!is.null(x$diffs.lsmeans.table) && nrow(x$diffs.lsmeans.table)>0)
     plotLSMEANS(x$diffs.lsmeans.table, x$response, "DIFF of LSMEANS", 

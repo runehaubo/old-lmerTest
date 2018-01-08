@@ -26,8 +26,6 @@ stepFun <- function(model, ddf = "Satterthwaite", type = 3,
   result$corr.intsl <- checkCorr(model)   
   anova.table <- NULL
   
-
-  
   ## save results for fixed effects for model with only fixed effects
   if(class(model) == "lm" | class(model) == "gls")
   {
@@ -39,7 +37,6 @@ stepFun <- function(model, ddf = "Satterthwaite", type = 3,
   ## analysis of the random part  
   result.rand <- elimRandEffs(model, alpha.random, reduce.random, 
                               keep.effs$randeffs)  
-  
   model <- result.rand$model
   ## convert rand table to data frame
   rt <- as.data.frame(result.rand$TAB.rand)
@@ -56,8 +53,6 @@ stepFun <- function(model, ddf = "Satterthwaite", type = 3,
   ## save results for fixed effects for model with only fixed effects
   if(class(model) == "lm" | class(model) == "gls")
     return(saveResultsFixModel(result, model, type))
-  
-  
  
   ## perform reduction of fixed effects for model with mixed effects
   stop = FALSE
@@ -66,13 +61,10 @@ stepFun <- function(model, ddf = "Satterthwaite", type = 3,
   rho <- list() ## environment containing info about model
   rho <- rhoInit(rho, model, change.contr)
   
-  while(!stop)
-  {      
+  while(!stop) {      
     ## if there are no fixed terms
-    if(nrow(anova(model, ddf="lme4"))==0)
-    {
-      if(is.null(anova.table))
-        return(emptyResult(result, model))
+    if(nrow(anova(model, ddf="lme4"))==0) {
+      if(is.null(anova.table)) return(emptyResult(result, model))
       break
     }   
     
@@ -82,8 +74,7 @@ stepFun <- function(model, ddf = "Satterthwaite", type = 3,
     test.terms <- attr(terms(rho$model),"term.labels") ## define the terms that are to be tested
     
     ## initialize anova table
-    if(is.first.anova)
-    {
+    if(is.first.anova) {
       anova.table <- initAnovaTable(rho$model, test.terms, reduce.fixed) 
       is.first.anova <- FALSE
       elim.num <- 1
@@ -100,24 +91,19 @@ stepFun <- function(model, ddf = "Satterthwaite", type = 3,
     anova.table <- fillAnovaTable(resultFpvalueSS,  anova.table)
     
     
-    if(!reduce.fixed)             
-      break     
-    else
-    {
+    if(!reduce.fixed) break     
+    else {
       resNSelim <- elimNSFixedTerm(rho, anova.table, alpha.fixed, 
                                    elim.num, keep.effs$fixedeffs, change.contr)
       if(is.null(resNSelim))
         break
-      else
-      {
+      else {
         rho <- resNSelim$rho
         anova.table <- updateAnovaTable(resNSelim)
         elim.num <- elim.num + 1
       }        
-    }      
-    
+    }
   }
-  
   ## convert anova table to data frame
   anova.table <- as.data.frame(anova.table)
   anova.table$NumDF <- as.integer(anova.table$NumDF)
@@ -126,27 +112,20 @@ stepFun <- function(model, ddf = "Satterthwaite", type = 3,
   result$anova.table <- anova.table
 
   ## if in step function least squares means of diffs of LSMEANS are required
-  if(lsmeans.calc)
-  {
+  if(lsmeans.calc) {
     lsmeans.tab <- calcLSMEANS(rho, alpha.fixed, test.effs = test.effs,
                                lsmeansORdiff = TRUE)
     result$lsmeans.table <- lsmeans.tab$summ.data
-  }
-  else
-  {
+  } else {
     result$lsmeans.table <- NULL
   }
-  if(difflsmeans.calc)
-  {
+  if(difflsmeans.calc) {
     lsmeans.tab <- calcLSMEANS(rho, alpha.fixed, test.effs = test.effs, 
                                lsmeansORdiff=FALSE)
     result$diffs.lsmeans.table <- lsmeans.tab$summ.data
-  }
-  else
-  {
+  } else {
     result$diffs.lsmeans.table <- NULL
   }
-  
   
   ## format anova.table and random.table according to elim.num column
   result$anova.table <- formatElimNumTable(result$anova.table) 
@@ -155,7 +134,6 @@ stepFun <- function(model, ddf = "Satterthwaite", type = 3,
   ## save model
   if(inherits(rho$model, "merMod"))
     model <- as(rho$model,"merModLmerTest")
-  
   result$model <- rho$model
   return(result)
 }
@@ -164,8 +142,7 @@ stepFun <- function(model, ddf = "Satterthwaite", type = 3,
 ################################################################################
 ## find NS effect from the model (starting from highest order interactions)
 ################################################################################
-getNSFixedTerm <- function(anova.table, alpha, keep.effs = NULL)
-{
+getNSFixedTerm <- function(anova.table, alpha, keep.effs = NULL) {
   
   pv.max <- 0
   
@@ -217,10 +194,7 @@ elimNSFixedTerm <- function(rho, anova.table, alpha, elim.num,
 ###############################################################################
 ## get terms to compare in anova.table
 ###############################################################################
-#getTermsToCompare <- function(model)
-getTermsToCompare <- function(anova.table, keep.effs = NULL)
-{
-  
+getTermsToCompare <- function(anova.table, keep.effs = NULL) {
   #order.terms <- attr(terms(model),"order")
   #allterms <- attr(terms(model),"term.labels")
   anova.table.upd <- anova.table[complete.cases(anova.table), , drop=FALSE]
@@ -287,25 +261,21 @@ getIndTermsContained <- function(allterms, ind.hoi)
 
 
 
-orderterms <- function(anova.table)
-{
+orderterms <- function(anova.table) {
   return(unlist(lapply(rownames(anova.table), function(x) 
     length(unlist(strsplit(x,":"))))))
 }
 
 
-
-
-.findKeepRandEff <- function(keep.eff, model.effs){
+.findKeepRandEff <- function(keep.eff, model.effs) {
   randTerms <- getRandTermsTable(names(model.effs))
   is.scalar <- unlist(lapply(randTerms, function(x) x$sl.part == "1"))
   randTermsScal <- randTerms[is.scalar]
   randTermsSl <- randTerms[!is.scalar]
   keep.eff.scal <- .findKeepEff(keep.eff, names(randTermsScal))
   keep.eff.slope <- .findKeepEffSlope(keep.eff, randTermsSl)
-  c(keep.eff.scal, keep.eff.slope)  
+  c(keep.eff.scal, keep.eff.slope)
 }
-
 
 
 .getKeepEffs <- function(keep.effs, model.effs){
@@ -318,8 +288,7 @@ orderterms <- function(anova.table)
 }
 
 
-.findKeepEffSlope <- function(keep.eff, randTermsSl){
-  
+.findKeepEffSlope <- function(keep.eff, randTermsSl) {
   ind.Slope <- unlist(lapply(randTermsSl, function(x) x$sl.part == keep.eff)) 
   if(sum(ind.Slope) == 0){
     ind.Gr <- unlist(lapply(randTermsSl, function(x) x$gr.part == keep.eff)) 
@@ -330,13 +299,12 @@ orderterms <- function(anova.table)
 }
 
 
-.getKeepInter <- function(model.eff, split.keep.eff){
+.getKeepInter <- function(model.eff, split.keep.eff) {
   if(setequal(unlist(strsplit(model.eff, ":")), split.keep.eff))
     return(model.eff)
 }
 
-.findKeepEff <- function(keep.eff, model.effs){
-  
+.findKeepEff <- function(keep.eff, model.effs) {
   ## for main terms
   if(length(grep(":", keep.eff)) == 0){
     if(keep.eff %in% model.effs)
@@ -351,9 +319,8 @@ orderterms <- function(anova.table)
 
 
 ## format table according to elim.num column
-formatElimNumTable <- function(table)
-{
-  if("elim.num" %in% colnames(table)){
+formatElimNumTable <- function(table) {
+  if("elim.num" %in% colnames(table)) {
     table[which(table[,"elim.num"]==0),"elim.num"] <- 1000
     table <- table[with(table, order(elim.num, decreasing=FALSE)),]
     table[,"elim.num"] <- as.character(table[,"elim.num"])

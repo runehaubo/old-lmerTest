@@ -3,7 +3,7 @@
 ################################################################################
 
 lsmeans.calc <- function(model, alpha, test.effs = NULL, 
-                         lsmeansORdiff = TRUE, ddf = "Satterthwaite"){
+                         lsmeansORdiff = TRUE, ddf = "Satterthwaite") {
   rho <- list() ## environment containing info about model
   rho <- rhoInit(rho, model, TRUE) ## save lmer outcome in rho envir variable
   rho$A <- calcApvar(rho) ## asymptotic variance-covariance matrix for theta and sigma
@@ -21,8 +21,7 @@ lsmeans.calc <- function(model, alpha, test.effs = NULL,
 ## calculate LSMEANS DIFFS and CI for all effects
 ################################################################################
 calcLSMEANS <- function(rho, alpha, test.effs = NULL, 
-                        lsmeansORdiff = TRUE, ddf = "Satterthwaite")
-{  
+                        lsmeansORdiff = TRUE, ddf = "Satterthwaite") {  
   m <- refitLM(rho$model)
   effs <- attr(terms(m),"term.labels")
   if(!is.null(test.effs))
@@ -36,16 +35,12 @@ calcLSMEANS <- function(rho, alpha, test.effs = NULL,
   dd <- model.frame(rho$model) 
   
   ## init lsmeans summary
-  if(lsmeansORdiff)
-  {
+  if(lsmeansORdiff) {
     lsmeans.summ <-  matrix(ncol=length(facs)+7,nrow=0)
     colnames(lsmeans.summ) <- c(facs,"Estimate","Standard Error", "DF", 
                                 "t-value", "Lower CI", "Upper CI", "p-value")
     summ.data <- as.data.frame(lsmeans.summ)
-    
-  }
-  else
-  {
+  } else {
     ## init diff summary
     diff.summ <-  matrix(ncol=7,nrow=0)
     colnames(diff.summ) <- c("Estimate","Standard Error", "DF", "t-value", 
@@ -53,22 +48,18 @@ calcLSMEANS <- function(rho, alpha, test.effs = NULL,
     summ.data <- as.data.frame(diff.summ)
   }
   
-  for(eff in effs)
-  {
+  for(eff in effs) {
     split.eff  <-  unlist(strsplit(eff,":"))
     if(checkAllCov(split.eff, dd))
       next
     mat  <-  popMatrix(m, split.eff)
     fac.comb <- getFacCombForLSMEANS(split.eff, dd)  
-    
     if(!lsmeansORdiff)
-      summ.data <- rbind(summ.data,   calcDiffsForEff(facs, fac.comb, split.eff,
-                                                      eff, effs, rho, alpha,
-                                                      mat, ddf))
+      summ.data <- rbind(summ.data, calcDiffsForEff(
+        facs, fac.comb, split.eff, eff, effs, rho, alpha, mat, ddf))
     else
-      summ.data <- rbind(summ.data,   calcLsmeansForEff(lsmeans.summ, fac.comb, 
-                                                        eff, split.eff, alpha, 
-                                                        mat, rho, facs, ddf))
+      summ.data <- rbind(summ.data, calcLsmeansForEff(
+        lsmeans.summ, fac.comb, eff, split.eff, alpha, mat, rho, facs, ddf))
   }
   return(list(summ.data = summ.data))
 }
@@ -200,7 +191,7 @@ popMatrix <- function(object, effect=NULL, at=NULL, only.at=TRUE){
       
       #print(newdata)
       mm   <- .getX(object, newdata)
-      X    <- apply(mm,2,mean)
+      X    <- apply(mm, 2, mean)
       res[[ii]] <- X
     }
     
@@ -212,9 +203,9 @@ popMatrix <- function(object, effect=NULL, at=NULL, only.at=TRUE){
     #    print(at)
     #    print(ccc)
     #eff.grid[,names(ccc)] <- at[intersect(vartype$numeric, names(at))]
-    eff.grid[,names(ccc)] <- ccc
-    attr(res,"grid") <- eff.grid
-    attr(res,"at") <- at
+    eff.grid[, names(ccc)] <- ccc
+    attr(res, "grid") <- eff.grid
+    attr(res, "at") <- at
   }
   class(res) <- c("popMatrix", "conMatrix", "matrix")
   res 
@@ -227,21 +218,17 @@ popMatrix <- function(object, effect=NULL, at=NULL, only.at=TRUE){
 ###################################################################
 #get the combinatoion of the fixed factors for the lsmeans
 ###################################################################
-getFacCombForLSMEANS <- function(split.eff, data)
-{
-  if(length(split.eff)==1)
-    data.merge <- as.data.frame(levels(data[,split.eff]))
-  if(length(split.eff)>=2)
-    data.merge <- merge(levels(data[,split.eff[1]]),levels(data[,split.eff[2]]))
-  if(length(split.eff)>=3)
-  {
-    for(i in 3:length(split.eff))
-    {
-      d.split.eff_i <- as.data.frame(levels(data[,split.eff[i]]))
-      names(d.split.eff_i) <- paste("l",i)
-      data.merge <- merge(data.merge,d.split.eff_i)
+getFacCombForLSMEANS <- function(split.eff, data) {
+  if(length(split.eff) == 1)
+    data.merge <- as.data.frame(levels(data[, split.eff]))
+  if(length(split.eff) >= 2)
+    data.merge <- merge(levels(data[, split.eff[1]]), levels(data[, split.eff[2]]))
+  if(length(split.eff) >= 3) {
+    for(i in 3:length(split.eff)) {
+      d.split.eff_i <- as.data.frame(levels(data[, split.eff[i]]))
+      names(d.split.eff_i) <- paste("l", i)
+      data.merge <- merge(data.merge, d.split.eff_i)
     }
-    
   }
   names(data.merge) <- split.eff
   return(as.matrix(data.merge))
@@ -250,12 +237,9 @@ getFacCombForLSMEANS <- function(split.eff, data)
 ###################################################################
 #checks if all the terms in interaction are covariates
 ###################################################################
-checkAllCov <- function(split.eff, data)
-{
-  for(spleff in split.eff)
-  {
-    if(!is.factor(data[,spleff]))
-    {
+checkAllCov <- function(split.eff, data) {
+  for(spleff in split.eff) {
+    if(!is.factor(data[, spleff])) {
       return(TRUE)  
     }
   }
@@ -265,67 +249,51 @@ checkAllCov <- function(split.eff, data)
 ###################################################################
 #concatenate levels of the effects to form the rownames
 ###################################################################
-concatLevs <- function(matr, row.names)
-{
-  
+concatLevs <- function(matr, row.names) {
   if(is.vector(matr))
     levs <- paste(names(matr),matr)
-  else
-  {
+  else {
     levs <- paste(rownames(matr),matr[,1])
-    for(i in 2:ncol(matr))
-    {
+    for(i in 2:ncol(matr)) {
       levs <- paste(levs,matr[,i])
     }    
   }
-  
-  
   return(levs)
 }
 
 #convert facs into numeric
-convertFacsToNum <- function(data, begin, end)
-{
-  
+convertFacsToNum <- function(data, begin, end) {
   #convert vars to numeric
   for(i in begin:end)
-    data[,i] <- as.numeric(levels(data[,i])[as.integer(data[,i])]) 
-  
+    data[,i] <- as.numeric(levels(data[, i])[as.integer(data[, i])]) 
   return(data)
 }
 
-
 #convert numeric to facs
-convertNumsToFac <- function(data, begin, end)
-{
-  
+convertNumsToFac <- function(data, begin, end) {
   #convert vars to numeric
   for(i in begin:end)
     data[,i] <- as.factor(data[,i]) 
-  
   return(data)
 }
-
 
 ###################################################################
 #fills the LSMEANS and DIFF summary matrices
 ###################################################################
-fillLSMEANStab <- function(mat, rho, summ.eff, nfacs, alpha, ddf = "Satterthwaite")
-{
-
+fillLSMEANStab <- function(mat, rho, summ.eff, nfacs, alpha, 
+                           ddf = "Satterthwaite") {
   newcln <- colnames(mat)[colnames(mat) %in% names(rho$fixEffs)]
   ## check estimability
   if(sum(!colnames(mat) %in% names(rho$fixEffs)) > 0){
     ids.est <- checkForEstim(mat, rho)
     mat <- mat[ids.est, , drop = FALSE]
-  }else{
+  } else {
     ids.est <- 1:nrow(mat)
   }
   if(length(ids.est) == 0)
     return(summ.eff)
-  mat <- matrix(mat[,colnames(mat) %in% names(rho$fixEffs)], nrow=nrow(mat), 
-                ncol=length(newcln), dimnames=list(rownames(mat),  newcln))
-  
+  mat <- matrix(mat[, colnames(mat) %in% names(rho$fixEffs)], nrow=nrow(mat), 
+                ncol=length(newcln), dimnames=list(rownames(mat), newcln))
   estim.lsmeans <- mat %*% rho$fixEffs
   summ.eff[ids.est, nfacs+1] <- estim.lsmeans  
 
@@ -338,45 +306,43 @@ fillLSMEANStab <- function(mat, rho, summ.eff, nfacs, alpha, ddf = "Satterthwait
   if(is.vector(ttest.res))
     ttest.res <- t(as.matrix(ttest.res))
 
-  summ.eff[ids.est, nfacs+2] <- ttest.res[,4]#stdErrLSMEANS(rho, std.rand, mat)
+  summ.eff[ids.est, nfacs+2] <- ttest.res[, 4]#stdErrLSMEANS(rho, std.rand, mat)
   #df
-  summ.eff[ids.est, (nfacs+3)] <- ttest.res[,1]
+  summ.eff[ids.est, (nfacs+3)] <- ttest.res[, 1]
   #t values
-  summ.eff[ids.est, (nfacs+4)] <- ttest.res[,2]
+  summ.eff[ids.est, (nfacs+4)] <- ttest.res[, 2]
   #p values
-  summ.eff[ids.est, (nfacs+7)] <- ttest.res[,3]
+  summ.eff[ids.est, (nfacs+7)] <- ttest.res[, 3]
   # CIs
   summ.eff[ids.est, nfacs+5] <- estim.lsmeans - 
-    abs(qt(alpha/2,ttest.res[,1])) * ttest.res[,4]
+    abs(qt(alpha/2, ttest.res[,1])) * ttest.res[, 4]
   summ.eff[ids.est ,nfacs+6] <- estim.lsmeans + 
-    abs(qt(alpha/2,ttest.res[,1])) * ttest.res[,4]
+    abs(qt(alpha/2, ttest.res[,1])) * ttest.res[, 4]
   return(summ.eff)
 }
 
 ###################################################################
 #round the columns of LSMEANS or DIFFS tables
 ###################################################################
-roundLSMEANStab <- function(summ.eff, nfacs)
-{
-  summ.eff[,nfacs+1] <- round(summ.eff[,nfacs+1],4)  
-  summ.eff[,nfacs+2] <- round(summ.eff[,nfacs+2],4)
+roundLSMEANStab <- function(summ.eff, nfacs) {
+  summ.eff[, nfacs+1] <- round(summ.eff[, nfacs+1], 4)  
+  summ.eff[, nfacs+2] <- round(summ.eff[, nfacs+2], 4)
   #df
-  summ.eff[,(nfacs+3)] <- round(summ.eff[,(nfacs+3)],1)
+  summ.eff[, (nfacs+3)] <- round(summ.eff[, (nfacs+3)], 1)
   #t values
-  summ.eff[,(nfacs+4)] <- round(summ.eff[,(nfacs+4)],2)
+  summ.eff[, (nfacs+4)] <- round(summ.eff[, (nfacs+4)], 2)
   #p values
-  summ.eff[,(nfacs+7)] <- round(summ.eff[,(nfacs+7)],4)
+  summ.eff[, (nfacs+7)] <- round(summ.eff[, (nfacs+7)], 4)
   # CIs
-  summ.eff[,nfacs+5] <- round(summ.eff[,nfacs+5],4)
-  summ.eff[,nfacs+6] <- round(summ.eff[,nfacs+6],4)
+  summ.eff[, nfacs+5] <- round(summ.eff[, nfacs+5], 4)
+  summ.eff[, nfacs+6] <- round(summ.eff[, nfacs+6], 4)
   return(summ.eff)
 }
 
 ############################################################################
 #function to identify the colors of bar according to significance of effects
 ############################################################################
-calc.cols <- function(x)
-{
+calc.cols <- function(x) {
   if(x<0.001) 
     return("red") 
   if(x<0.01) 
@@ -386,8 +352,7 @@ calc.cols <- function(x)
   return("grey")
 }
 
-calc.cols2 <- function(x)
-{
+calc.cols2 <- function(x) {
   if(x<0.001) 
     return("p-value < 0.001")#return("red")# 
   if(x<0.01) 
@@ -398,8 +363,7 @@ calc.cols2 <- function(x)
 }
 
 #get names for ploting barplots for the effects
-getNamesForPlot <- function(names, ind)
-{
+getNamesForPlot <- function(names, ind) {
   namesForPlot <- unlist(lapply(names, 
                                 function(y) 
                                   substring2(y, 1, 
@@ -414,9 +378,7 @@ getNamesForPlot <- function(names, ind)
 ## plots for LSMEANS or DIFF of LSMEANS
 plotLSMEANS <- function(table, response, 
                         which.plot=c("LSMEANS", "DIFF of LSMEANS"), 
-                        main = NULL, cex = 1.4, effs = NULL, mult = TRUE)
-{
-  
+                        main = NULL, cex = 1.4, effs = NULL, mult = TRUE) {
   if(!is.null(effs)){
     rnames <- rownames(table)
     diffs.facs <- sapply(rnames, 
@@ -428,25 +390,22 @@ plotLSMEANS <- function(table, response,
   }
   
   if(which.plot=="LSMEANS")
-    names <- getNamesForPlot(rownames(table),2)
+    names <- getNamesForPlot(rownames(table), 2)
   else
-    names <- getNamesForPlot(rownames(table),1)   
-  
-  
-    
+    names <- getNamesForPlot(rownames(table), 1)   
+
   namesForPlot <- names$namesForPlot
   namesForLevels <- names$namesForLevels
   un.names <- unique(namesForPlot)
-  
   
   ### changed code to transfer to ggplot
   ttplot <- table
   ttplot$namesforplots <- namesForPlot
   ttplot$levels <- as.factor(namesForLevels)
-  colnames(ttplot)[which(colnames(ttplot)=="p-value")] <- "pvalue"
-  colnames(ttplot)[which(colnames(ttplot)=="Lower CI")] <- "lci"
-  colnames(ttplot)[which(colnames(ttplot)=="Upper CI")] <- "uci"
-  ttplot$col.bars <-  unlist(lapply(ttplot[,"pvalue"], calc.cols2))
+  colnames(ttplot)[which(colnames(ttplot) == "p-value")] <- "pvalue"
+  colnames(ttplot)[which(colnames(ttplot) == "Lower CI")] <- "lci"
+  colnames(ttplot)[which(colnames(ttplot) == "Upper CI")] <- "uci"
+  ttplot$col.bars <-  unlist(lapply(ttplot[, "pvalue"], calc.cols2))
   ttplot <- ttplot[,c("levels", "Estimate", "col.bars", "lci", "uci", 
                       "namesforplots")]
   uci <- lci <- col.bars <- Estimate <- NULL
@@ -465,8 +424,8 @@ plotLSMEANS <- function(table, response,
                             "p-value < 0.05" = "yellow", 
                             "p-value < 0.001" = "red"), name="Significance")  +
     ylab(response) + facet_wrap( ~ namesforplots, scales = "free")
-  else{
-    for(i in 1:length(un.names)){
+  else {
+    for(i in 1:length(un.names)) {
       names.plot <- un.names[i]
       subplot <- ttplot[ttplot$namesforplots == names.plot,]
       ggplot(subplot, aes(x=levels, y = Estimate, fill = col.bars)) + 
@@ -490,33 +449,26 @@ plotLSMEANS <- function(table, response,
 
 ## calculate DIFFERENCES OF LSMEANS and STDERR for effect
 calcDiffsForEff <- function(facs, fac.comb, split.eff, eff, effs, rho, 
-                            alpha, mat, ddf)
-{
+                            alpha, mat, ddf) {
   ## calculating diffs for 2 way interaction
-  if(length(split.eff)>=1 && length(split.eff)<=2)
-  {   
-    if(length(split.eff)==2)
-    {            
+  if(length(split.eff) >= 1 && length(split.eff) <= 2) {   
+    if(length(split.eff) == 2) {            
       fac.comb.names <- concatLevs(fac.comb)
       main.eff <- effs[effs %in% split.eff]
       
       mat.names.diffs <- combn(fac.comb.names,2)
-      mat.nums.diffs <- apply(mat.names.diffs, c(1,2), 
-                              function(x) which(fac.comb.names==x))
-           
+      mat.nums.diffs <- apply(mat.names.diffs, c(1, 2), 
+                              function(x) which(fac.comb.names == x))
+    } else {
+      mat.names.diffs <- combn(fac.comb, 2)
+      mat.nums.diffs <- apply(mat.names.diffs, c(1, 2), 
+                              function(x) which(fac.comb == x))
     }
-    else
-    {
-      mat.names.diffs <- combn(fac.comb,2)
-      mat.nums.diffs <- apply(mat.names.diffs, c(1,2), 
-                              function(x) which(fac.comb==x))
-    }
-    
     mat.diffs <- matrix(0, nrow=ncol(mat.nums.diffs), ncol=ncol(mat))
     colnames(mat.diffs) <- colnames(mat)
-    for(ind.diffs in 1:ncol(mat.nums.diffs))
-    {
-      mat.diffs[ind.diffs,] <- mat[mat.nums.diffs[1,ind.diffs],]- mat[mat.nums.diffs[2,ind.diffs],]
+    for(ind.diffs in 1:ncol(mat.nums.diffs)) {
+      mat.diffs[ind.diffs,] <- mat[mat.nums.diffs[1, ind.diffs], ] - 
+        mat[mat.nums.diffs[2, ind.diffs], ]
     }
     names.combn <- apply(mat.names.diffs, 2, 
                          function(x) paste(x[1], x[2], sep=" - "))
@@ -534,12 +486,9 @@ calcDiffsForEff <- function(facs, fac.comb, split.eff, eff, effs, rho,
 }
 
 
-
 ## calculate LSMEANS and STDERR for effect
 calcLsmeansForEff <- function(lsmeans.summ, fac.comb, eff, split.eff, alpha, mat, 
-                              rho, facs, ddf)
-{
-  
+                              rho, facs, ddf) {
   summ.eff <- matrix(NA, ncol=ncol(lsmeans.summ), nrow=nrow(fac.comb))
   colnames(summ.eff) <- colnames(lsmeans.summ)
   #rownames(summ.eff) <- rep(eff, nrow(fac.comb))
@@ -548,10 +497,7 @@ calcLsmeansForEff <- function(lsmeans.summ, fac.comb, eff, split.eff, alpha, mat
   summ.eff <- as.data.frame(fillLSMEANStab(mat, rho, summ.eff, length(facs), 
                                            alpha, ddf))
   summ.eff <- convertFacsToNum(summ.eff, length(facs)+1, ncol(summ.eff))
-  
   summ.eff <- roundLSMEANStab(summ.eff, length(facs))
-  
-   
   rownames(summ.eff) <- paste(rep(eff, nrow(fac.comb)), names.arg)
   return(summ.eff) 
 }
