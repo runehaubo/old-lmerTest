@@ -11,9 +11,9 @@ fm <- lmer(Reaction ~ Days + (1|Subject) + (0+Days|Subject), sleepstudy)
 (sfm <- summary(fm))
 
 ## Test class:
-# stopifnot(all(
-#   class(sfm) == c("summary.merModLmerTest", "summary.merMod")
-# ))
+stopifnot(all(
+  class(sfm) == c("summary.merModLmerTest", "summary.merMod")
+))
 stopifnot(class(summary(fm, ddf="lme4")) == "summary.merMod")
 
 ## Test coefficient table names:
@@ -26,13 +26,13 @@ stopifnot(all( # rownames
 ))
 
 ## Test pass of 'correlation' argument to lme4:::summary.merMod:
-# x <- capture.output(summary(fm))
-# x_nocor <- capture.output(summary(fm, correlation=FALSE))
-# txt <- "Correlation of Fixed Effects:"
-# stopifnot(
-#   any(grep(txt, x)),
-#   !any(grepl(txt, x_nocor))
-# )
+x <- capture.output(summary(fm))
+x_nocor <- capture.output(summary(fm, correlation=FALSE))
+txt <- "Correlation of Fixed Effects:"
+stopifnot(
+  any(grep(txt, x)),
+  !any(grepl(txt, x_nocor))
+)
 
 # Test warning with unrecognized arguments (caught by lme4:::summary.merMod):
 # assertWarning(summary(fm, false_arg=FALSE))

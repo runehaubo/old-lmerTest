@@ -158,13 +158,13 @@ setMethod("anova", signature(object="merModLmerTest"),
 setMethod("summary", signature(object = "merModLmerTest"), function(object, ddf="Satterthwaite", ...) {
   if(!is.null(ddf) && ddf=="lme4") {
     if(class(object) == "merModLmerTest")
-      return(summary(as(object, "lmerMod")))
+      return(summary(as(object, "lmerMod"), ...))
     #return(cl)
   } else {
     ## commented callNextMethod
     ## since it produces warning, summary cannot have multiple arguments
     ## cl <- callNextMethod()
-    if(class(object) == "merModLmerTest") cl <- summary(as(object, "lmerMod"))
+    if(class(object) == "merModLmerTest") cl <- summary(as(object, "lmerMod"), ...)
     # Return lme4-summary if there are no fixed effects:
     if(length(fixef(object)) == 0L) return(cl)
     # errors in specifying the parameters
@@ -182,6 +182,8 @@ setMethod("summary", signature(object = "merModLmerTest"), function(object, ddf=
     colnames(cl$coefficients)[3:5] <- c("df","t value","Pr(>|t|)")              
   }   
   
+  cl$objClass <- class(object) # Used by lme4:::print.summary.lmerMod
+  class(cl) <- c("summary.merModLmerTest", class(cl))
   cl$methTitle <- paste(cl$methTitle,  "\nt-tests use ", ddf, 
                         "approximations to degrees of freedom")
   return(cl)
