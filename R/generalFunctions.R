@@ -120,7 +120,8 @@ lmer <- function(formula, data = NULL, REML = TRUE,
 
 
 
-setMethod("anova", signature(object="merModLmerTest"), function(object, ..., ddf="Satterthwaite", type=3) {
+setMethod("anova", signature(object="merModLmerTest"), 
+          function(object, ..., ddf="Satterthwaite", type=3) {
   mCall <- match.call(expand.dots = TRUE)
   dots <- list(...)
   modp <- if (length(dots))
@@ -145,8 +146,7 @@ setMethod("anova", signature(object="merModLmerTest"), function(object, ..., ddf
           paste("Analysis of Variance Table of type", as.roman(type) ,
                 " with ", ddf, 
                 "\napproximation for degrees of freedom")
-      }
-      else {
+      } else {
         message("anova from lme4 is returned\nsome computational error has occurred in lmerTest")
       }
       class(table) <- c("anova", "data.frame")
@@ -156,15 +156,17 @@ setMethod("anova", signature(object="merModLmerTest"), function(object, ..., ddf
 })
 
 setMethod("summary", signature(object = "merModLmerTest"), function(object, ddf="Satterthwaite", ...) {
-  if(!is.null(ddf) && ddf=="lme4"){
+  if(!is.null(ddf) && ddf=="lme4") {
     if(class(object) == "merModLmerTest")
       return(summary(as(object, "lmerMod")))
     #return(cl)
-  }else{
+  } else {
     ## commented callNextMethod
     ## since it produces warning, summary cannot have multiple arguments
     ## cl <- callNextMethod()
     if(class(object) == "merModLmerTest") cl <- summary(as(object, "lmerMod"))
+    # Return lme4-summary if there are no fixed effects:
+    if(length(fixef(object)) == 0L) return(cl)
     # errors in specifying the parameters
     ddf <- checkNameDDF(ddf)
     

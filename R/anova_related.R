@@ -33,19 +33,20 @@ calcANOVA <- function(model, ddf = "Satterthwaite", type = 3,
 }
 
 ## calculate t test for the summary function for lmerMod object
-calcSummary <- function(model, ddf = "Satterthwaite"){
-  
+calcSummary <- function(model, ddf = "Satterthwaite") {
+  # Make rho-list:
   rho <- list() ## vector containing info about model
   rho <- rhoInit(rho, model, FALSE) ## save lmer outcome in rho envir variable
-  
-  if(ddf == "Satterthwaite")
+  # Make contrast matrix:
+  Lmat <- diag(rep(1, length(rho$fixEffs)))
+  if(ddf == "Satterthwaite") {
     rho$A <- calcApvar(rho) ## asymptotic variance-covariance matrix for theta and sigma  
-  if(ddf == "Satterthwaite")
-    result <- aaply(diag(rep(1,length(rho$fixEffs))), .margins=2,
-                  .fun = calcSatterth1DF, rho = rho, isF = FALSE)
-  else
-    result <- aaply(diag(rep(1,length(rho$fixEffs))), .margins=2,
-                    .fun = calcKR1DF, rho = rho)
+    result <- do.call(rbind, lapply(1:nrow(Lmat), function(i) # always a matrix
+      calcSatterth1DF(rho=rho, L=Lmat[i, , drop=TRUE], isF=FALSE)))
+  } else { # KR-method:
+    result <- do.call(rbind, lapply(1:nrow(Lmat), function(i) 
+      calcKR1DF(rho=rho, L=Lmat[i, , drop=TRUE])))
+  }
   return(list(df = result[, "df"], tvalue = result[, "t value"], 
               tpvalue = result[, "p-value"]))
 }
