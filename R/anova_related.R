@@ -13,7 +13,16 @@ calcANOVA <- function(model, ddf = "Satterthwaite", type = 3,
   if(ddf == "Satterthwaite")
     rho$A <- calcApvar(rho) ## asymptotic variance-covariance matrix for theta and sigma  
 
-  rho$Xlist <- createDesignMat(rho) ## X design matrix for fixed effects
+  # Return an empty ANOVA table if there are no terms (there may be an intercept):
+  term_names <- attr(terms(rho$model), "term.labels")
+  if(length(term_names) == 0) {
+    x <- numeric(0L)
+    an <- data.frame("Sum Sq"=x, "Mean Sq"=x, "NumDF"=x, "DenDF"=x,
+                     "F.value"=x, "Pr(>F)"=x, check.names = FALSE)
+    return(an)
+  }
+  ## X design matrix for fixed effects
+  rho$Xlist <- createDesignMat(rho) # does not work without terms
   
   ## define the terms that are to be tested
   rho$test.terms <- attr(terms(rho$model),

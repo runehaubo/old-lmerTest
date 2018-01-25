@@ -12,7 +12,7 @@ anova(Oats.lmer2)
 ### Fit the same model to a random subset:
 set.seed(12345)
 ss <- sample(1:72, 51)
-randSub.lmer = update(Oats.lmer, subset = sample(1:72, 51))
+randSub.lmer = update(Oats.lmer, subset = ss)
 randSub.lmer <- as(randSub.lmer, "merModLmerTest")
 randSub.lmer2 = update(Oats.lmer, subset = ss)
 randSub.lmer2 <- as(randSub.lmer2, "merModLmerTest")
@@ -45,7 +45,11 @@ stopifnot(all.equal(unlist(calcSatterth(randSub.lmer, L)),
 ## however using sample together with transformation of the variables in formula
 ## results in error 
 Oats.lmer3 <- lmer(log(yield) ~ Variety + nitfac + (1|Block/Variety), data = Oats)
-randSub.lmer3 = as(update(Oats.lmer3, subset = sample(1:72, 51)), "merModLmerTest")
+randSub.lmer3 <- as(update(Oats.lmer3, subset = ss), "merModLmerTest")
+an <- anova(randSub.lmer3)
+stopifnot(ncol(an) == 6L)
+set.seed(12345)
+randSub.lmer3 <- as(update(Oats.lmer3, subset = sample(1:72, 51)), "merModLmerTest")
 an <- anova(randSub.lmer3)
 stopifnot(ncol(an) == 4)
 

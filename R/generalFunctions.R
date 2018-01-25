@@ -118,8 +118,6 @@ lmer <- function(formula, data = NULL, REML = TRUE,
 }
 
 
-
-
 setMethod("anova", signature(object="merModLmerTest"), 
           function(object, ..., ddf="Satterthwaite", type=3) {
   mCall <- match.call(expand.dots = TRUE)
@@ -130,30 +128,25 @@ setMethod("anova", signature(object="merModLmerTest"),
   if (any(modp)) {
     return(callNextMethod())
   }
-  else
-  {
-    cnm <- callNextMethod()
-    if(!is.null(ddf) &&  ddf=="lme4") return(cnm)
-    {
-      table <- cnm 
-      ## errors in specifying the parameters
-      ddf <- checkNameDDF(ddf)
-      an.table <- tryCatch({calcANOVA(model=object, ddf=ddf, type=type)}
-                           , error = function(e) { NULL })
-      if(!is.null(an.table)) {
-        table <- an.table
-        attr(table, "heading") <- 
-          paste("Analysis of Variance Table of type", as.roman(type) ,
-                " with ", ddf, 
-                "\napproximation for degrees of freedom")
-      } else {
-        message("anova from lme4 is returned\nsome computational error has occurred in lmerTest")
-      }
-      class(table) <- c("anova", "data.frame")
-      return(table)
-    }
+  if(!is.null(ddf) &&  ddf=="lme4") return(callNextMethod())
+  ddf <- checkNameDDF(ddf)   ## errors in specifying the parameters
+  an.table <- tryCatch({calcANOVA(model=object, ddf=ddf, type=type)}
+                       , error = function(e) { NULL })
+  if(!is.null(an.table)) {
+    table <- an.table
+    attr(table, "heading") <- 
+      paste("Analysis of Variance Table of type", as.roman(type) ,
+            " with ", ddf, 
+            "\napproximation for degrees of freedom")
+  } else {
+    message("anova from lme4 is returned\nsome computational error has occurred in lmerTest")
+    return(callNextMethod())
   }
-})
+  class(table) <- c("anova", "data.frame")
+  return(table)
+          }
+)
+
 
 setMethod("summary", signature(object = "merModLmerTest"), function(object, ddf="Satterthwaite", ...) {
   if(!is.null(ddf) && ddf=="lme4") {
