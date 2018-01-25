@@ -1,5 +1,6 @@
 # test_anova.R
 library(lmerTest)
+
 stopifnot(require(tools)) # For assertError and assertWarning
 data("sleepstudy", package="lme4")
 data("cake", package="lme4")

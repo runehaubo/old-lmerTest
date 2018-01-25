@@ -35,7 +35,7 @@ stopifnot(
 )
 
 # Test warning with unrecognized arguments (caught by lme4:::summary.merMod):
-# assertWarning(summary(fm, false_arg=FALSE))
+assertWarning(summary(fm, false_arg=FALSE))
 
 ## Test pass of extra arguments to lme4:::print.summary.merMod:
 x <- capture.output(print(summary(fm), signif.stars=TRUE))
@@ -71,10 +71,8 @@ stopifnot(isTRUE(
 # Test printed output
 # - Satterthwaite
 x <- capture.output(sfm) # equal to output of 'print(sfm)'
-txt <- c("t-tests use Satterthwaite",
+txt <- c("merModLmerTest", "t-tests use Satterthwaite",
          "df", "t value", "Pr(>|t|)")
-# txt <- c("lmerModLmerTest", "t-tests use Satterthwaite's method",
-#          "df", "t value", "Pr(>|t|)")
 stopifnot(all(
   sapply(txt, function(text) any(grepl(text, x)))
 ))
@@ -83,10 +81,10 @@ stopifnot(all(
 # - KR
 (sfm <- summary(fm, ddf="Kenward"))
 x <- capture.output(sfm)
-txt <- c("t-tests use Kenward-Roger",
-         "df", "t value", "Pr(>|t|)")
-# txt <- c("lmerModLmerTest", "t-tests use Kenward-Roger's method",
+# txt <- c("t-tests use Kenward-Roger",
 #          "df", "t value", "Pr(>|t|)")
+txt <- c("merModLmerTest", "t-tests use Kenward-Roger",
+         "df", "t value", "Pr(>|t|)")
 stopifnot(all(
   sapply(txt, function(text) any(grepl(text, x)))
 ))
