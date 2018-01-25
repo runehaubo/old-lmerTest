@@ -39,7 +39,6 @@ calcSatterth1DF <- function(rho, L, isF = TRUE){
 ## calculates t test with KR approximation uses vcovAdj function
 ## from pbkrtest package
 calcKR1DF <- function(rho, L){
-  
   if (!requireNamespace("pbkrtest", quietly = TRUE)) 
     stop("pbkrtest package required for Kenward-Roger's approximations")
   result <- matrix(0, nrow = 1, ncol = 4)
@@ -211,8 +210,7 @@ devfunTheta <- function(fm)
 
 
 ## returns Lc %*% vcov as a function of theta parameters %*% t(Lc)
-vcovLThetaL <- function(fm)
-{
+vcovLThetaL <- function(fm) {
   stopifnot(is(fm, "merMod"))
   
   np <- length(fm@pp$theta)

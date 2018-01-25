@@ -2,8 +2,7 @@
 ##########################################################################
 ## Create rho vector containing info about  mixed model ##################
 ##########################################################################
-rhoInit <- function(rho, model, change.contr = FALSE, mf.final = NULL)
-{
+rhoInit <- function(rho, model, change.contr = FALSE, mf.final = NULL) {
   if(change.contr)
     rho$model <- updateModel(model, mf.final = mf.final, change.contr = change.contr)
   else
