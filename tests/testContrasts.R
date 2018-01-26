@@ -1,5 +1,12 @@
 ## TODO: load data tree here
 
+# WRE says "using if(requireNamespace("pkgname")) is preferred, if possible."
+# even in tests:
+assertError <- function(expr, ...) 
+  if(requireNamespace("tools")) tools::assertError(expr, ...) else invisible()
+assertWarning <- function(expr, ...) 
+  if(requireNamespace("tools")) tools::assertWarning(expr, ...) else invisible()
+
 require(lmerTest)
 
 load(system.file("testdata", "tree.RData", package="lmerTest"))
@@ -22,10 +29,10 @@ modelCarrots.sas <- lme4::lmer(Preference ~
 
 ## here an error produces
 ## NO MORE in lme4 1.1-8
-# tools::assertError(stopifnot(all.equal(logLik(modelCarrots.treat), 
+# assertError(stopifnot(all.equal(logLik(modelCarrots.treat), 
 #                                        logLik(modelCarrots.sas))))
 # 
-# tools::assertError(stopifnot(all.equal(VarCorr(modelCarrots.treat), 
+# assertError(stopifnot(all.equal(VarCorr(modelCarrots.treat), 
 #                                        VarCorr(modelCarrots.sas), tol = 1e-5)))
 
 

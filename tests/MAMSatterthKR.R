@@ -1,6 +1,12 @@
 require(lmerTest)
 testType1 <- TRUE
 
+# WRE says "using if(requireNamespace("pkgname")) is preferred, if possible."
+# even in tests:
+assertError <- function(expr, ...) 
+  if(requireNamespace("tools")) tools::assertError(expr, ...) else invisible()
+assertWarning <- function(expr, ...) 
+  if(requireNamespace("tools")) tools::assertWarning(expr, ...) else invisible()
 
 lm.pred <- lm(as.formula(paste("Lightlevel", "~", 
                                paste(c("TVset","Picture"), collapse="*"), sep="")),
@@ -12,7 +18,7 @@ lmerTVpic <- lmer(Lightlevel ~ TVset*Picture +   Assessor:x  + (1|Assessor) +
 
 ## TODO: check with SAS dfs for Satterthwaite and KR to agree
 if(testType1){
-tools::assertWarning(anova(lmerTVpic, type=1)) ## warning: ddf=0 for TVset
+assertWarning(anova(lmerTVpic, type=1)) ## warning: ddf=0 for TVset
 anova(lmerTVpic, type=1, ddf="Kenward-Roger")
 }
 

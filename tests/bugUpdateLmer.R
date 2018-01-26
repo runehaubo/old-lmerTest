@@ -1,5 +1,12 @@
 require(lmerTest)
 
+# WRE says "using if(requireNamespace("pkgname")) is preferred, if possible."
+# even in tests:
+assertError <- function(expr, ...) 
+  if(requireNamespace("tools")) tools::assertError(expr, ...) else invisible()
+assertWarning <- function(expr, ...) 
+  if(requireNamespace("tools")) tools::assertWarning(expr, ...) else invisible()
+
 m <- lme4::lmer(Informed.liking ~ Product + (1|Consumer) , data = ham)
 
 initRho <- function(model){
@@ -12,4 +19,4 @@ initRho <- function(model){
 
 m2 <- initRho(m)
 
-tools::assertError(update(m2))
+assertError(update(m2))

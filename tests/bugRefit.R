@@ -1,5 +1,12 @@
 require(lmerTest)
 
+# WRE says "using if(requireNamespace("pkgname")) is preferred, if possible."
+# even in tests:
+assertError <- function(expr, ...) 
+  if(requireNamespace("tools")) tools::assertError(expr, ...) else invisible()
+assertWarning <- function(expr, ...) 
+  if(requireNamespace("tools")) tools::assertWarning(expr, ...) else invisible()
+
 ## TODO uncomment the following whenever fixed deepcopy thing
 ## with the lme4
 ifTest <- TRUE
@@ -28,8 +35,8 @@ if(ifTest){
     step(rf)
   }
   
-  tools::assertError(update(f1(TVbo$Colourbalance)))
-  tools::assertError(step(f2(TVbo$Colourbalance)))
+  assertError(update(f1(TVbo$Colourbalance)))
+  assertError(step(f2(TVbo$Colourbalance)))
   
   # the following does not work for lme4 1.1-8
   #lapply(TVbo[, 7, drop=FALSE], f4)
@@ -71,7 +78,7 @@ if(ifTest){
   ## anova does not work in this case
   an1 <- anova(as(fit2, "merModLmerTest"))
   
-  tools::assertError(stopifnot(ncol(an1) == 6))
+  assertError(stopifnot(ncol(an1) == 6))
   
   ## anova works in the following case
   d2 <- lmer(form, data=LC2)

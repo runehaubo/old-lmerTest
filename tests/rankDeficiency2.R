@@ -1,5 +1,12 @@
 require(lmerTest)
 
+# WRE says "using if(requireNamespace("pkgname")) is preferred, if possible."
+# even in tests:
+assertError <- function(expr, ...) 
+  if(requireNamespace("tools")) tools::assertError(expr, ...) else invisible()
+assertWarning <- function(expr, ...) 
+  if(requireNamespace("tools")) tools::assertWarning(expr, ...) else invisible()
+
 carrots$Income <- as.factor(carrots$Income)
 carrots$Age <- as.factor(carrots$Age)
 
@@ -18,7 +25,7 @@ stopifnot(
   , TRUE)
 
 
-tools::assertError(step(m.carrots)) ## error because of the convergence issues
+assertError(step(m.carrots)) ## error because of the convergence issues
 
 load(system.file("testdata","bread.RData", package="lmerTest"))
 bread$Children <- as.factor(bread$Children)

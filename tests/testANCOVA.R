@@ -1,5 +1,12 @@
 require(lmerTest)
 
+# WRE says "using if(requireNamespace("pkgname")) is preferred, if possible."
+# even in tests:
+assertError <- function(expr, ...) 
+  if(requireNamespace("tools")) tools::assertError(expr, ...) else invisible()
+assertWarning <- function(expr, ...) 
+  if(requireNamespace("tools")) tools::assertWarning(expr, ...) else invisible()
+
 testType1 <- TRUE
 
 if(testType1){
@@ -78,7 +85,7 @@ stopifnot(all.equal(an.1[, "F.value"], c(56.5394, 4169.87), tol = TOL),
 
 
 # the one from lme4 is different
-tools::assertError(stopifnot(all.equal(an.lme4[, "F value"], an.1, tol = TOL)))
+assertError(stopifnot(all.equal(an.lme4[, "F value"], an.1, tol = TOL)))
 
 
 ## checking lsmeans

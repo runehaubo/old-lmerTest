@@ -1,5 +1,12 @@
 require(lmerTest)
 
+# WRE says "using if(requireNamespace("pkgname")) is preferred, if possible."
+# even in tests:
+assertError <- function(expr, ...) 
+  if(requireNamespace("tools")) tools::assertError(expr, ...) else invisible()
+assertWarning <- function(expr, ...) 
+  if(requireNamespace("tools")) tools::assertWarning(expr, ...) else invisible()
+
 ## rand step lsmeans difflsmeans should work only with inheritance of lmerMod class
 
 ## TODO uncomment the following whenever fixed deepcopy thing
@@ -11,19 +18,19 @@ if(ifTest){
                data = cbpp, family = binomial)
   
   ## should not work with glmer models
-  tools::assertError(rand(gm1))
-  tools::assertError(step(gm1))
-  tools::assertError(lsmeans(gm1))
-  tools::assertError(difflsmeans(gm1))
+  assertError(rand(gm1))
+  assertError(step(gm1))
+  assertError(lsmeans(gm1))
+  assertError(difflsmeans(gm1))
   
   ## should not work with nlmer models
   # startvec <- c(Asym = 200, xmid = 725, scal = 350)
   # nm1 <- nlmer(circumference ~ SSlogis(age, Asym, xmid, scal) ~ Asym|Tree,
   #               Orange, start = startvec)
-  # tools::assertError(rand(nm1))
-  # tools::assertError(step(nm1))
-  # tools::assertError(lsmeans(nm1))
-  # tools::assertError(difflsmeans(nm1))
+  # assertError(rand(nm1))
+  # assertError(step(nm1))
+  # assertError(lsmeans(nm1))
+  # assertError(difflsmeans(nm1))
   
   
   ## should work with lmer from lme4 package (class lmerMod)
