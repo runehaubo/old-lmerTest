@@ -297,12 +297,13 @@ fillLSMEANStab <- function(mat, rho, summ.eff, nfacs, alpha,
   estim.lsmeans <- mat %*% rho$fixEffs
   summ.eff[ids.est, nfacs+1] <- estim.lsmeans  
 
-  if(ddf == "Satterthwaite")
-    ttest.res <- aaply(t(mat), .margins=2,
-                  .fun = calcSatterth1DF, rho = rho, isF = FALSE)
-  else
-    ttest.res <- aaply(t(mat), .margins=2,
-                       .fun = calcKR1DF, rho = rho)
+  ttest.res <- if(ddf == "Satterthwaite") {
+    do.call(rbind, lapply(1:nrow(mat), function(i)
+      calcSatterth1DF(rho=rho, L=mat[i, ], isF=FALSE)))
+  } else {
+    ttest.res <- do.call(rbind, lapply(1:nrow(mat), function(i)
+      calcKR1DF(rho=rho, L=mat[i, ])))
+  }
   if(is.vector(ttest.res))
     ttest.res <- t(as.matrix(ttest.res))
 

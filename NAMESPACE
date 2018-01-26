@@ -1,12 +1,13 @@
 #useDynLib(lmerTest, .registration=TRUE)
 import(lme4)
 #importFrom(numDeriv, hessian, grad)
-importFrom(plyr, llply, aaply)
 import(Matrix)
 import(methods)
-importFrom(MASS, ginv)
 import(Hmisc)
 import(ggplot2)
+
+importFrom(MASS, ginv)
+
 importFrom("stats", "terms", "as.formula", "complete.cases", "delete.response", 
            "drop1", "formula", "lm", "logLik", "model.frame", "model.matrix", 
            "pchisq", "pf", "printCoefmat", "pt", "qt", "setNames", 

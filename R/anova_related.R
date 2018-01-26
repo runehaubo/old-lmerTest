@@ -32,10 +32,10 @@ calcANOVA <- function(model, ddf = "Satterthwaite", type = 3,
 
   ## calculate general set of hypothesis matrix 
   L <- calcGeneralSet(rho, type) 
-  
-  resultFpvalueSS <- llply(rho$test.terms, calcFpvalueMAIN, L = L, 
-                           rho = rho, 
-                           ddf = ddf, type = type)
+  ## compute (list of) F-values etc.:
+  resultFpvalueSS <- lapply(rho$test.terms, function(tt)
+    calcFpvalueMAIN(term=tt, L=L, rho=rho, ddf=ddf, type=type)
+  )
   ## fill anova table
   anova.table <- fillAnovaTable(resultFpvalueSS,  anova.table)
   anova.table

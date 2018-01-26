@@ -59,9 +59,8 @@ elimRandEffs <- function(model, alpha, reduce.random,
     
     fm <- paste(fmodel)    
     
-    
-    infoForTerms <- llply(rand.terms.table, .fun = .doLRT, rand.terms, fmodel, 
-                          model)
+    infoForTerms <- lapply(rand.terms.table, .doLRT, rand.terms=rand.terms,
+                           fmodel=fmodel, model=model)
     
     ## find the maximal p-value if the reduction is required
     if(reduce.random) 

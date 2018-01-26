@@ -104,23 +104,20 @@ calcSatterthMultDF <- function(rho, Lc) {
   theopt <- c(rho$thopt, rho$sigma)
   g <- mygrad(function(x)  vss2(x), theopt)
   
-  if(class(g) == "numeric")
-    mat.grad <- llply(1:length(theopt), function(x) matrix(g[x], 
-                                                           ncol = ncol(vcov.final), 
-                                                           nrow = nrow(vcov.final)))
-  else
-    mat.grad <- llply(1:length(theopt), function(x) matrix(g[, x], 
-                                                           ncol = ncol(vcov.final), 
-                                                           nrow = nrow(vcov.final)))
-  
+  mat.grad <- if(class(g) == "numeric") {
+    lapply(1:length(theopt), function(i) array(g[i], dim=dim(vcov.final)))
+  } else { 
+    lapply(1:length(theopt), function(i) array(g[, i], dim=dim(vcov.final)))
+  }
+
   nu.m.fun <- function(m){    
-    den.nu <- unlist(llply(1:length(mat.grad), function(x) 
-      as.matrix(t(PL[m,]) %*% mat.grad[[x]] %*% PL[m,])))   
-    2*(svdec$values[m])^2/(t(den.nu) %*% rho$A %*% den.nu)
+    den.nu <- unlist(lapply(1:length(mat.grad), function(i) 
+      as.matrix(t(PL[m, ]) %*% mat.grad[[i]] %*% PL[m, ])
+    ))   
+    2 * (svdec$values[m])^2 / (t(den.nu) %*% rho$A %*% den.nu)
   }
   
-  
-  nu.m <- unlist(llply(1:length(svdec$values), .fun = nu.m.fun))
+  nu.m <- unlist(lapply(1:length(svdec$values), nu.m.fun))
   
   nu.m[which(abs(2 - nu.m) < 1e-5)] <- 2.00001
   

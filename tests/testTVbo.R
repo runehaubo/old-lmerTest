@@ -19,13 +19,9 @@ get_models <- function(responses) {
   })
 }
 
-
 mlist <- get_models(responses)
-if(require(plyr)){
-  system.time(ls1 <- llply(mlist, anova, .progress = "text"))
-  names(ls1) <- responses
-  print(ls1)  
-}
-
+system.time(ls1 <- lapply(mlist, anova, .progress = "text"))
+names(ls1) <- responses
+print(ls1)  
 
 

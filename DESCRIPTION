@@ -1,14 +1,14 @@
 Package: lmerTest
 Type: Package
 Title: Tests in Linear Mixed Effects Models
-Version: 2.0-37
+Version: 2.0-37.9001
 Authors@R: c(person("Alexandra", "Kuznetsova", role = c("aut")),
                    person("Per", "Bruun Brockhoff", role = c("aut", "ths", "cre"),
                    email = "perbb@dtu.dk"),
                    person("Rune", "Haubo Bojesen Christensen", role =  c("aut"),
 		   email = "Rune@ChristensenStatistics.dk"))
 Depends: R (>= 3.0.0), Matrix, stats, methods, lme4 (>= 1.0)
-Imports: plyr, MASS, Hmisc, ggplot2
+Imports: MASS, Hmisc, ggplot2
 Suggests: pbkrtest, nlme, estimability
 Description: Different kinds of tests for linear mixed effects models as implemented
     in 'lme4' package are provided. The tests comprise types I - III F tests

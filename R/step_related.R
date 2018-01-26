@@ -82,14 +82,13 @@ stepFun <- function(model, ddf = "Satterthwaite", type = 3,
     
     ## calculate general set of hypothesis matrix 
     L <- calcGeneralSet(rho, type) 
-    
-    resultFpvalueSS <- llply(test.terms, calcFpvalueMAIN, L = L, 
-                             rho = rho, 
-                             ddf = ddf, type = type)
+
+    ## compute (list of) F-values etc.:
+    resultFpvalueSS <- lapply(test.terms, function(tt)
+      calcFpvalueMAIN(term=tt, L=L, rho=rho, ddf=ddf, type=type))
     
     ## fill anova table
     anova.table <- fillAnovaTable(resultFpvalueSS,  anova.table)
-    
     
     if(!reduce.fixed) break     
     else {
