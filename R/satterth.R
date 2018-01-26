@@ -124,7 +124,7 @@ calcSatterthMultDF <- function(rho, Lc) {
   E <- sum( (nu.m/(nu.m-2)) * as.numeric(nu.m>2))
   nu.F <- 2 * E * as.numeric(E > q) / (E - q)
   
-  pvalueF <- 1 - pf(F.stat,qr(Lc)$rank, nu.F)
+  pvalueF <- pf(F.stat,qr(Lc)$rank, nu.F, lower.tail=FALSE)
   
   # calculate ss and ms
   if(is.na(F.stat))
