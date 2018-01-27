@@ -239,7 +239,7 @@ makeContrastType2 <- function(L, X, trms, trms.lab) {
 
 
 makeContrastType2.term <- function(trm, L, X, trms.lab, fac) {
-  #find all effects that contain term effect
+  # Find all effects that contain term effect:
   num.relate <- relatives(attr(X, "dataClasses"), trm, trms.lab, fac)
   contain <- trms.lab[num.relate]
   if(length(contain) == 0 && (which(trms.lab == trm) == length(trms.lab))){
@@ -249,15 +249,15 @@ makeContrastType2.term <- function(trm, L, X, trms.lab, fac) {
   } else {
     ## columns of the X are rearranged in a way that columns corresponding to the 
     ## effects that do not contain effet term are put before the columns corresponding 
-    ## to the term
+    ## to the term:
     ind.indep <- which(names(attr(X, "assign")) != trm & 
                          !(names(attr(X, "assign")) %in% contain))
     new.X <- cbind(X[,ind.indep, drop = FALSE], X[,-ind.indep, drop = FALSE])
     attr(new.X, "assign") <- c(attr(X, "assign")[ind.indep], attr(X, "assign")[-ind.indep])
-    ## doolittle transform t(new.X) %*% new.X
+    ## doolittle transform t(new.X) %*% new.X:
     L <- calcGeneralSet12(new.X)
     colnames(L) <- colnames(new.X)
-    ## columns of L are rearranged to reflect the original order
+    ## columns of L are rearranged to reflect the original order:
     Lc <- L[which(names(attr(new.X, "assign")) == trm), , drop = FALSE]
     Lc <- Lc[, colnames(X), drop = FALSE]
   }
@@ -282,13 +282,14 @@ makeContrastType1 <- function(L, X, trms, trms.lab) {
 
 
 calcGeneralSet12 <- function(X) {
-  p <- ncol(X)
-  XtX <- crossprod(X)
-  U <- doolittle(XtX)$U
-  d <- diag(U)
-  for(i in 1:nrow(U))
-    if(d[i] > 0) U[i, ] <- U[i, ] / d[i]
-  L <- U
-  L
+  t(doolittle(crossprod(X))$L)
+  # p <- ncol(X)
+  # XtX <- crossprod(X)
+  # U <- doolittle(XtX)$U
+  # d <- diag(U)
+  # for(i in 1:nrow(U))
+  #   if(d[i] > 0) U[i, ] <- U[i, ] / d[i]
+  # L <- U
+  # L
 }
 
